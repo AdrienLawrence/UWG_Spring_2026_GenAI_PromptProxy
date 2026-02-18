@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prompt Proxy</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="app">
+      <header class="header">
+        <h1>Prompt Proxy</h1>
+        <p class="subtitle">Sanitize + wrap user input before sending it to an LLM</p>
+      </header>
+
+      <main class="grid">
+        <!-- INPUT PANEL -->
+        <section class="card">
+          <h2 class="card-title">Input</h2>
+
+          <label class="label" for="userInput">User Input</label>
+          <textarea
+            id="userInput"
+            class="textarea"
+            placeholder="Type a natural language request..."
+            rows="7"
+          ></textarea>
+
+          <div class="row">
+            <div class="field">
+              <label class="label" for="personaSelect">System Prompt (Persona)</label>
+              <select id="personaSelect" class="select">
+                <option value="Software Engineer">Software Engineer</option>
+                <option value="Computer Science Teacher">Computer Science Teacher</option>
+                <option value="Musician">Musician</option>
+                <option value="Network Administrator">Network Administrator</option>
+                <option value="Artist">Artist</option>
+                <option value="Photographer">Photographer</option>
+                <option value="Nurse">Nurse</option>
+                <option value="Pediatrician">Pediatrician</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label" for="temperature">
+                Temperature: <span id="tempValue">0.7</span>
+              </label>
+              <input
+                id="temperature"
+                class="slider"
+                type="range"
+                min="0"
+                max="2"
+                step="0.1"
+                value="0.7"
+              />
+              <div class="hint">
+                0.0 = deterministic • 1.0 = balanced • 1.5+ = creative/chaotic
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="generateBtn" class="btn">Generate</button>
+            <button id="clearBtn" class="btn secondary">Clear</button>
+          </div>
+
+          <div id="status" class="status" aria-live="polite"></div>
+        </section>
+
+        <!-- OUTPUT PANEL -->
+        <section class="card">
+          <h2 class="card-title">Result</h2>
+
+          <div class="tabs">
+            <button class="tab active" data-tab="output">Model Output</button>
+            <button class="tab" data-tab="payload">Final Payload</button>
+          </div>
+
+          <div class="panel active" id="panel-output">
+            <pre id="outputBox" class="pre">(Your model response will appear here)</pre>
+          </div>
+
+          <div class="panel" id="panel-payload">
+            <pre id="payloadBox" class="pre">(Your final wrapped prompt/payload will appear here)</pre>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <small>
+          By: Adrien Lawrence
+        </small>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+      // Tiny UI wiring (safe to keep here; you can move it into script.js if you want)
+      const temp = document.getElementById("temperature");
+      const tempValue = document.getElementById("tempValue");
+      const clearBtn = document.getElementById("clearBtn");
+      const userInput = document.getElementById("userInput");
+      const outputBox = document.getElementById("outputBox");
+      const payloadBox = document.getElementById("payloadBox");
+
+      temp.addEventListener("input", () => {
+        tempValue.textContent = Number(temp.value).toFixed(1);
+      });
+
+      clearBtn.addEventListener("click", () => {
+        userInput.value = "";
+        outputBox.textContent = "(Your model response will appear here)";
+        payloadBox.textContent = "(Your final wrapped prompt/payload will appear here)";
+      });
+
+      // Tab switch
+      document.querySelectorAll(".tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach((b) => b.classList.remove("active"));
+          document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+
+          btn.classList.add("active");
+          const tab = btn.getAttribute("data-tab");
+          document.getElementById(`panel-${tab}`).classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>
